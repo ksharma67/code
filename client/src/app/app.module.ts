@@ -13,6 +13,7 @@ import { NavbarComponent } from './components/shared/navbar/navbar.component';
 import { FooterComponent } from './components/shared/footer/footer.component';
 import { BookingsComponent } from './components/bookings/bookings.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ForgotUsernameComponent } from './components/forgot-username/forgot-username.component';
 // import * as $ from 'jquery';
 
 @NgModule({
@@ -26,7 +27,8 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
     NavbarComponent,
     FooterComponent,
     BookingsComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ForgotUsernameComponent
   ],
   imports: [
     BrowserModule,

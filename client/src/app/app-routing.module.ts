@@ -12,6 +12,7 @@ import { LogoutComponent } from './components/logout/logout.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { NavbarComponent } from './components/shared/navbar/navbar.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ForgotUsernameComponent } from './components/forgot-username/forgot-username.component';
 
 const routes: Routes = [
   {
@@ -54,6 +55,10 @@ const routes: Routes = [
   {
     path: 'forgot-password',
     component: ForgotPasswordComponent
+  },
+  {
+    path: 'forgot-username',
+    component: ForgotUsernameComponent
   }
 ];
 

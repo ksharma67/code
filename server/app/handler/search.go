@@ -2,11 +2,7 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
-	"math/rand"
 	"net/http"
-	"strconv"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/ksharma67/EasyWay/server/app/model"

@@ -5,11 +5,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/jinzhu/gorm"
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"github.com/ksharma67/EasyWay/server/app/handler"
 	"github.com/ksharma67/EasyWay/server/app/handlers"
+	"github.com/ksharma67/EasyWay/server/app/model"
 	"github.com/ksharma67/EasyWay/server/config"
+	"gopkg.in/gomail.v2"
 	//"gorm.io/driver/sqlite"
 )
 
@@ -48,6 +50,7 @@ func (a *App) setRouters() {
 	a.Get("/getCancelledBookings", a.GetCancelledBookings)
 	a.Get("/getServiceInfo", a.GetServiceInfo)
 	a.Get("/getUserDetails", a.GetUserDetails)
+	a.Get("/searchServices", a.SearchServices)
 }
 
 // Wrap the router for GET method
@@ -143,6 +146,13 @@ func (a *App) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	handler.GetUserDetails(a.DB, w, r)
 }
+func (a *App) SearchServices(w http.ResponseWriter, r *http.Request) {
+	// Parse query parameter
+	query := r.URL.Query().Get("query")
+
+	// Call handler to search services in database
+	handler.SearchServices(a.DB, w, r, query)
+}
 
 // Run the app on it's router
 func (a *App) Run(host string) {
@@ -150,11 +160,59 @@ func (a *App) Run(host string) {
 }
 
 // ForgotPasswordHandler
-func (a *App) ForgotPassword(w http.ResponseWriter, r *http.Request){
-    http.HandleFunc("/forgotpassword", handlers.forgotPasswordHandler)
+func (a *App) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/forgotpassword", handlers.ForgotPasswordHandler)
 
-    err := http.ListenAndServe(":8080", nil)
-    if err != nil {
-        log.Fatal("Error starting HTTP server: ", err)
-    }
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("Error starting HTTP server: ", err)
+	}
+}
+
+// Handler function for the "forgot username" form submission
+func (a *App) ForgotUsername(w http.ResponseWriter, r *http.Request) {
+	// Parse the email or phone number from the form data
+	r.ParseForm()
+	email := r.Form.Get("email")
+
+	// Validate the input
+	if email == "" {
+		// Input is invalid
+		http.Error(w, "Please enter your email", http.StatusBadRequest)
+		return
+	}
+
+	// Query the database for the user(s) with the given email
+	var users []model.User
+	if email != "" {
+		a.DB.Where("email = ?", email).Find(&users)
+	}
+
+	// Check if any users were found
+	if len(users) == 0 {
+		// No user found with the given email
+		http.Error(w, "We couldn't find your account. Please check your email.", http.StatusNotFound)
+		return
+	}
+
+	// Send the username(s) to the user via email
+	for _, user := range users {
+		message := gomail.NewMessage()
+		message.SetHeader("From", "noreply@easyway.com")
+		message.SetHeader("To", email)
+		message.SetHeader("Subject", "Username request")
+		fmt.Printf("Username for %s: %s\n", user.Name, user.Username)
+
+		// Create a new dialer to connect to Mailtrap
+		dialer := gomail.NewDialer("sandbox.smtp.mailtrap.io", 2525, "b587fb03c51f13", "7f047af2a761af")
+
+		// Send the message
+		if err := dialer.DialAndSend(message); err != nil {
+			http.Error(w, "Error sending email", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Inform the user that their username(s) have been sent
+	fmt.Fprint(w, "Your username(s) have been sent to your email.")
 }

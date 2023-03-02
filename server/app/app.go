@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
+	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	"github.com/ksharma67/EasyWay/server/app/handler"
@@ -51,6 +51,7 @@ func (a *App) setRouters() {
 	a.Get("/getServiceInfo", a.GetServiceInfo)
 	a.Get("/getUserDetails", a.GetUserDetails)
 	a.Get("/searchServices", a.SearchServices)
+	a.Post("/forgotPassword", a.ForgotPassword)
 }
 
 // Wrap the router for GET method
@@ -146,13 +147,24 @@ func (a *App) GetUserDetails(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	handler.GetUserDetails(a.DB, w, r)
 }
-func (a *App) SearchServices(w http.ResponseWriter, r *http.Request) {
-	// Parse query parameter
-	query := r.URL.Query().Get("query")
 
-	// Call handler to search services in database
-	handler.SearchServices(a.DB, w, r, query)
+// Search services by name
+func (a *App) SearchServices(w http.ResponseWriter, r *http.Request) {
+  query := r.URL.Query().Get("q")
+  if query == "" {
+    http.Error(w, "Missing query parameter", http.StatusBadRequest)
+    return
+  }
+
+  // Get a list of services that match the query
+  var services []model.Service
+  a.DB.Where("name LIKE ?", "%"+query+"%").Find(&services)
+
+  // Return the list of services as a JSON response
+  w.Header().Set("Content-Type", "application/json")
+  json.NewEncoder(w).Encode(services)
 }
+
 
 // Run the app on it's router
 func (a *App) Run(host string) {

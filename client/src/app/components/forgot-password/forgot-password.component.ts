@@ -24,21 +24,24 @@ export class ForgotPasswordComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.forgotPasswordForm.invalid) {
-      return;
-    }
-
-    const email = this.forgotPasswordForm.value.email;
-
-    this.http.post('/api/forgot-password', { email }).subscribe(
-      (response) => {
-        console.log('Password reset email sent.');
-      },
-      (error) => {
-        console.log('Error resetting password:', error);
-      }
-    );
+  if (this.forgotPasswordForm.invalid) {
+    return;
   }
+
+  const email = this.forgotPasswordForm.value.email;
+
+  this.http.post(GlobalConstants.apiURL + '/forgot-password', { email }).subscribe(
+    (response) => {
+      console.log('Password reset email sent.');
+      // TODO: show success message to user
+    },
+    (error) => {
+      console.log('Error resetting password:', error);
+      // TODO: show error message to user
+    }
+  );
+}
+
   highlight(event: any): void {
     event.target.style['border-bottom'] = "1px solid rgba(30, 40, 51, 0.9)";
     event.target.style['opacity'] = "0.9";

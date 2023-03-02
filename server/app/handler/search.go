@@ -8,14 +8,6 @@ import (
 	"github.com/ksharma67/EasyWay/server/app/model"
 )
 
-func (a *App) SearchServices(w http.ResponseWriter, r *http.Request) {
-	// Parse query parameter
-	query := r.URL.Query().Get("query")
-
-	// Call handler to search services in database
-	handler.SearchServices(a.DB, w, r, query)
-}
-
 func SearchServices(db *gorm.DB, w http.ResponseWriter, r *http.Request, query string) {
 	// Get a list of services that match the query
 	var services []model.Service

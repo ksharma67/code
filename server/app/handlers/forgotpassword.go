@@ -1,11 +1,12 @@
 package handlers
 
 import (
-    "net/http"
-		"crypto/rand"
-    "encoding/base64"
-		"gopkg.in/gomail.v2"
-		"fmt"
+	"crypto/rand"
+	"encoding/base64"
+	"fmt"
+	"net/http"
+
+	"gopkg.in/gomail.v2"
 )
 
 type ForgotPasswordRequest struct {
@@ -21,7 +22,7 @@ func generateToken() (string, error) {
     return base64.StdEncoding.EncodeToString(tokenBytes), nil
 }
 
-func forgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
+func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
     email := r.FormValue("email")
 
     // Generate a password reset token

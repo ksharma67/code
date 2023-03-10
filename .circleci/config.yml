@@ -25,4 +25,5 @@ workflows:
     example-workflow:
       jobs:
         - node/run:
+            app-dir: ~/client 
             npm-run: npm install && npm build 
